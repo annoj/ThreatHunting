@@ -1,0 +1,57 @@
+<form theme="dark">
+  <label>Investigation</label>
+  <fieldset submitButton="true" autoRun="true">
+    <input type="multiselect" token="investigation_uuid">
+      <label>Investigation</label>
+      <fieldForLabel>header</fieldForLabel>
+      <fieldForValue>uuid</fieldForValue>
+      <search>
+        <query>index=investigation parent_uuid=0
+| rex field=_raw "uuid: (?P&lt;uuid&gt;.*) parent_uuid.*header: (?P&lt;header&gt;.*) body"</query>
+        <earliest>0</earliest>
+        <latest></latest>
+      </search>
+    </input>
+    <input type="text" token="author">
+      <label>Author</label>
+    </input>
+    <input type="text" token="body">
+      <label>Text</label>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Investigation Timeline</title>
+      <table>
+        <search>
+          <query>index=investigation (uuid=$investigation_uuid$ OR parent_uuid=$investigation_uuid$)
+| table _time, author, body
+| sort + _time</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+          <refresh>30s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Last Added</title>
+      <table>
+        <search>
+          <query>| investigation parent_uuid=$investigation_uuid$ author="$author$" body="$body$" root=false
+| collect index=investigation 
+| rex field=_raw "author: (?P&lt;author&gt;.*) header: (?P&lt;header&gt;.*) body: (?P&lt;body&gt;.*)"
+| table _time, author, body</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+</form>

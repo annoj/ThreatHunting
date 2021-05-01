@@ -41,6 +41,7 @@
         <view name="pipe_whitelist"/>
         <view name="wmi_whitelist"/>      
      </collection>
+    <view name="investigation"/>
     <collection label="About">     
        <view name="about"/>  
        <view name="coverage"/>
