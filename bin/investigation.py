@@ -22,11 +22,15 @@ class GenerateInvestigationCommand(GeneratingCommand):
     def generate(self):
         if not self.root and not self.parent_uuid:
             raise Exception('Child node must have parent_uuid!')
+        if not self.author:
+            raise Exception('Author must be given!')
+        if not self.body:
+            raise Exception('Body must be given!')
         yield {
                 '_time': time.time(),
                 '_raw': (  
                           f'uuid: {str(uuid.uuid4())} '
-                        + f'parent_uuid: {self.parent_uuid} '
+                        + f'parent_uuid: {self.parent_uuid or 0} '
                         + f'author: {self.author} '
                         + f'header: {self.header} '
                         + f'body: {self.body}'
